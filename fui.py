@@ -6,7 +6,7 @@ stub = modal.Stub()
 image = modal.Image.debian_slim(python_version="3.10")
 
 # Install system packages using apt
-image = image.apt_install("git", "wget", "aria2c", "unzip")
+image = image.apt_install("git", "wget", "unzip")
 
 # Define a Modal function using the customized image
 @stub.function(image=image)
