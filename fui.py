@@ -1,8 +1,6 @@
 import modal
 import subprocess
 
-stub = modal.Stub("ForgeUI", image=fui_image)
-
 GPU = "t4"
 PORT = "7860"
 
@@ -32,6 +30,8 @@ fui_image = (
         gpu={GPU},
     )
 )
+
+stub = modal.Stub("ForgeUI", image=fui_image)
 
 @stub.function(
    #keep_warm=1,
