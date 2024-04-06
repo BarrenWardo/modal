@@ -40,13 +40,13 @@ fui_image = (
 
 @web_server(port=PORT, startup_timeout=180)
 
-START_COMMAND = [
+def run():
+    START_COMMAND = [
     "python",
     "launch.py",
     "--enable-insecure-extension-access",
     #"--share",
     "--skip-torch-cuda-test",
     "--xformers"
-]
-
-subprocess.Popen(START_COMMAND, shell=True)
+    ]
+    subprocess.Popen(START_COMMAND, shell=True)
