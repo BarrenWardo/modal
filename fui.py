@@ -1,9 +1,7 @@
 import modal
 import subprocess
 
-from modal import Image, Stub, web_server
-
-stub = Stub("ForgeUI", image=fui_image)
+stub = modal.Stub("ForgeUI", image=fui_image)
 
 GPU = "t4"
 PORT = "7860"
