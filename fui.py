@@ -5,8 +5,7 @@ GPU = "t4"
 PORT = "7860"
 
 fui_image = (
-    modal.Image
-    .debian.slim(python_version="3.11")
+    modal.Image.debian.slim(python_version="3.11")
     .apt_install(
         "git",
         "wget",
