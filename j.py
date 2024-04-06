@@ -19,11 +19,11 @@ import modal
 
 stub = modal.Stub(
     image=modal.Image.debian_slim().pip_install(
-        "jupyter", "bing-image-downloader~=1.1.2"
+        "jupyter"
     )
 )
 volume = modal.Volume.from_name(
-    "modal-examples-jupyter-inside-modal-data", create_if_missing=True
+    "jupyter", create_if_missing=True
 )
 
 CACHE_DIR = "/root/cache"
@@ -32,19 +32,6 @@ JUPYTER_TOKEN = "1234"  # Change me to something non-guessable!
 
 @stub.function(volumes={CACHE_DIR: volume})
 def seed_volume():
-    # Bing it!
-    from bing_image_downloader import downloader
-
-    # This will save into the Modal volume and allow you view the images
-    # from within Jupyter at a path like `/root/cache/modal labs/Image_1.png`.
-    downloader.download(
-        query="modal labs",
-        limit=10,
-        output_dir=CACHE_DIR,
-        force_replace=False,
-        timeout=60,
-        verbose=True,
-    )
     volume.commit()
 
 
