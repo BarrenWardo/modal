@@ -27,10 +27,6 @@ fui_image = (
         "git clone https://github.com/adieyal/sd-dynamic-prompts.git ./extensions/sd-dynamic-prompts",
         gpu=GPU,
     )
-    .pip_install_from_requirements(
-        requirements_txt="/FUI/requirements.txt",
-        gpu=GPU,
-    )
 )
 
 stub = modal.Stub("ForgeUI", image=fui_image)
