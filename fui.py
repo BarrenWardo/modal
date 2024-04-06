@@ -2,7 +2,7 @@ import modal
 import subprocess
 
 GPU = "t4"
-PORT = "7860"
+PORT = 7860
 
 fui_image = (
     modal.Image.debian_slim(python_version="3.11")
