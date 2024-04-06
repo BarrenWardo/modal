@@ -1,30 +1,55 @@
 import modal
+import subprocess
 
-stub = modal.Stub()
+stub = Stub("ForgeUI", image=fui_image)
 
-# Start with a base Debian slim image with Python 3.10
-image = modal.Image.debian_slim(python_version="3.10")
+GPU = "t4"
+PORT = "7860"
 
-# Install system packages using apt
-image = image.apt_install("git", "wget", "aria2", "unzip")
+fui_image = (
+    modal.Image
+    .debian.slim(python_version:"3.11")
+    .apt_install(
+        "git",
+        "wget",
+        "libgl1",
+        "libglib2.0-0",
+    )
+    .run_commands(
+        "git clone https://github.com/BarrenWardo/FUI.git",
+        "cd FUI",
+        "git clone https://github.com/etherealxx/batchlinks-webui.git ./extensions/batchlinks-webui",
+        "git clone https://github.com/Bing-su/adetailer.git ./extensions/adetailer",
+        "git clone https://github.com/Gourieff/sd-webui-reactor.git ./extensions/sd-webui-reactor",
+        "git clone https://github.com/Coyote-A/ultimate-upscale-for-automatic1111.git ./extensions/ultimate-upscale-for-automatic1111",
+        "git clone https://github.com/hako-mikan/sd-webui-regional-prompter.git ./extensions/sd-webui-regional-prompter",
+        "git clone https://github.com/AlUlkesh/stable-diffusion-webui-images-browser.git ./extensions/stable-diffusion-webui-images-browser",
+        "git clone https://github.com/zanllp/sd-webui-infinite-image-browsing.git ./extensions/sd-webui-infinite-image-browsing",
+        "git clone https://github.com/thomasasfk/sd-webui-aspect-ratio-helper.git ./extensions/sd-webui-aspect-ratio-helper",
+        "git clone https://github.com/catppuccin/stable-diffusion-webui.git ./extensions/stable-diffusion-webui",
+        "git clone https://github.com/adieyal/sd-dynamic-prompts.git ./extensions/sd-dynamic-prompts",
+    )
+    .pip_install_from_requirements(
+        requirements_txt: "/FUI/requirements.txt"
+        gpu: {GPU}
+    )
+)
 
-# Define a Modal function using the customized image
-@stub.function(image=image)
-@modal.web_server(port=7860)
-def web_server():
-    # Run the commands to set up and launch the web server
-    modal.subprocess.run(["git", "clone", "https://github.com/BarrenWardo/FUI"], check=True)
-    # Navigate to the cloned directory and install requirements
-    os.chdir("FUI")
-    modal.subprocess.run(["pip", "install", "-r", "requirements.txt"], check=True)
-    # Launch the Python script which starts a web server listening on port 7860
-    modal.subprocess.run(["python", "launch.py", "--xformers", "--enable-insecure-extension-access", "--update-all-extensions"], check=True)
+@stub.function(
+   #keep_warm=1,
+    cpu=2,
+    gpu={GPU},
+)
 
-@stub.local_entrypoint()
-def main():
-    with stub.run():
-        web_server()
+@web_server(port=PORT, startup_timeout=180)
 
-if __name__ == "__main__":
-    main()
-    
+START_COMMAND = [
+    "python",
+    "launch.py",
+    "--enable-insecure-extension-access",
+    #"--share",
+    "--skip-torch-cuda-test",
+    "--xformers"
+]
+
+subprocess.Popen(START_COMMAND, shell=True)
