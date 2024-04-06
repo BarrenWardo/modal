@@ -28,7 +28,7 @@ fui_image = (
         gpu=GPU,
     )
     .pip_install_from_requirements(
-        requirements_txt="$HOME/FUI/requirements.txt",
+        requirements_txt="/webui/FUI/requirements.txt",
         gpu=GPU,
     )
 )
