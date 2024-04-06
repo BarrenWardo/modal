@@ -38,7 +38,7 @@ stub = modal.Stub("ForgeUI", image=fui_image)
     gpu={GPU},
 )
 
-@web_server(port=PORT, startup_timeout=180)
+@modal.web_server(port=PORT, startup_timeout=180)
 
 def run():
     START_COMMAND = [
