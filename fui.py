@@ -47,6 +47,8 @@ def run():
     "--enable-insecure-extension-access",
     #"--share",
     "--skip-torch-cuda-test",
-    "--xformers"
+    "--xformers",
+    "--port",
+    f'"{PORT}"',
     ]
     subprocess.Popen(START_COMMAND, shell=True)
