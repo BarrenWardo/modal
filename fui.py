@@ -8,7 +8,7 @@ PORT = "7860"
 
 fui_image = (
     modal.Image
-    .debian.slim(python_version:"3.11")
+    .debian.slim(python_version="3.11")
     .apt_install(
         "git",
         "wget",
