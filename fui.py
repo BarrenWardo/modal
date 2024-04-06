@@ -43,6 +43,7 @@ def run():
     START_COMMAND = [
     "python",
     "launch.py",
+    "--listen",
     "--enable-insecure-extension-access",
     #"--share",
     "--skip-torch-cuda-test",
