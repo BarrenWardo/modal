@@ -26,7 +26,7 @@ fui_image = (
         "git clone https://github.com/catppuccin/stable-diffusion-webui.git ./extensions/stable-diffusion-webui",
         "git clone https://github.com/adieyal/sd-dynamic-prompts.git ./extensions/sd-dynamic-prompts",
         "pip install -r requirements.txt",
-        gpu={GPU},
+        gpu="t4",
     )
 )
 
