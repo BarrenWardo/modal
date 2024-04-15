@@ -1,6 +1,5 @@
 import os
 import subprocess
-import time
 import modal
 
 stub = modal.Stub(
@@ -21,8 +20,8 @@ def get_secrets():
     timeout = int(os.environ.get("Timeout"))
     return token, gpu, timeout
 
-@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, timeout=timeout)
-def run_jupyter(token: str, gpu: str, timeout: int):
+@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, gpu=gpu, timeout=timeout)
+def run_jupyter():
     jupyter_port = 8888
     with modal.forward(jupyter_port) as tunnel:
         jupyter_process = subprocess.Popen(
@@ -40,20 +39,9 @@ def run_jupyter(token: str, gpu: str, timeout: int):
         )
 
         print(f"Jupyter available at => {tunnel.url}")
-
-        try:
-            end_time = time.time() + timeout
-            while time.time() < end_time:
-                time.sleep(5)
-            print(f"Reached end of {timeout} second timeout period. Exiting...")
-        except KeyboardInterrupt:
-            print("Exiting...")
-        finally:
-            jupyter_process.kill()
+        jupyter_process.wait()
 
 @stub.local_entrypoint()
 def main():
-    token, gpu, timeout = get_secrets()
-    if gpu is not None:
-        run_jupyter.set_gpu(modal.gpu.from_name(gpu))
-    run_jupyter.remote(token, gpu, timeout)
+    get_secrets.remote()
+    run_jupyter.remote()
