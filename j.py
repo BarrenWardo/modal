@@ -21,7 +21,7 @@ def get_secrets():
     timeout = int(os.environ.get("Timeout"))
     return token, gpu, timeout
 
-@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs})
+@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, timeout=timeout)
 def run_jupyter(token: str, gpu: str, timeout: int):
     jupyter_port = 8888
     with modal.forward(jupyter_port) as tunnel:
@@ -54,4 +54,6 @@ def run_jupyter(token: str, gpu: str, timeout: int):
 @stub.local_entrypoint()
 def main():
     token, gpu, timeout = get_secrets()
-    run_jupyter.remote(token, gpu=gpu, timeout=timeout)
+    if gpu is not None:
+        run_jupyter.set_gpu(modal.gpu.from_name(gpu))
+    run_jupyter.remote(token, gpu, timeout)
