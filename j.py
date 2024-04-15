@@ -16,8 +16,8 @@ CACHE_DIR = "/root/SD"
 @stub.function(
         concurrency_limit=1, 
         network_file_systems={CACHE_DIR: nfs}, 
-    #    gpu="None", 
-        timeout=60
+    #    gpu="t4", 
+        timeout=3600
 )
 def run_jupyter():
     jupyter_port = 8888
