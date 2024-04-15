@@ -16,11 +16,11 @@ CACHE_DIR = "/root/SD"
 @stub.function(secrets=[modal.Secret.from_name("jupyter secrets")])
 def get_secrets():
     token = os.environ.get("Token")
-    gpu = os.environ.get("GPU")
-    timeout = int(os.environ.get("Timeout"))
+    vram = os.environ.get("GPU")
+    tout = int(os.environ.get("Timeout"))
     return token, gpu, timeout
 
-@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, gpu=gpu, timeout=timeout)
+@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, gpu=vram, timeout=tout)
 def run_jupyter():
     jupyter_port = 8888
     with modal.forward(jupyter_port) as tunnel:
