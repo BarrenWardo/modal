@@ -41,5 +41,4 @@ def run_jupyter():
 
 @stub.local_entrypoint()
 def main():
-    get_secrets.remote()
     run_jupyter.remote()
