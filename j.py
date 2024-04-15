@@ -13,7 +13,12 @@ nfs = modal.NetworkFileSystem.from_name(
 
 CACHE_DIR = "/root/SD"
 
-@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, gpu="None", timeout=60)
+@stub.function(
+        concurrency_limit=1, 
+        network_file_systems={CACHE_DIR: nfs}, 
+        gpu="None", 
+        timeout=60
+)
 def run_jupyter():
     jupyter_port = 8888
     with modal.forward(jupyter_port) as tunnel:
