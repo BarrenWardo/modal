@@ -2,8 +2,7 @@ import os
 import subprocess
 import modal
 
-def import_jupyter_secrets():
-    secrets = modal.Secret.from_name("jupyter secrets")
+def extract_jupyter_secrets():
     token = os.environ.get("Token")
     gpu = os.environ.get("GPU")
     timeout = int(os.environ.get("Timeout", 3600))
@@ -19,6 +18,13 @@ nfs = modal.NetworkFileSystem.from_name(
 )
 
 CACHE_DIR = "/root/SD"
+
+@stub.function(secrets=[modal.Secret.from_name("jupyter secrets")])
+def get_secrets():
+    token = os.environ.get("Token")
+    gpu = os.environ.get("GPU")
+    timeout = int(os.environ.get("Timeout", 3600))
+    return token, gpu, timeout
 
 @stub.function(network_file_systems={CACHE_DIR: nfs})
 def seed_volume():
@@ -48,6 +54,6 @@ def run_jupyter(token, gpu, timeout):
 
 @stub.local_entrypoint()
 def main():
-    token, gpu, timeout = import_jupyter_secrets()
+    token, gpu, timeout = get_secrets()
     seed_volume.remote()  
     run_jupyter.remote(token, gpu, timeout)
