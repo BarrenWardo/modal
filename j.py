@@ -13,7 +13,7 @@ nfs = modal.NetworkFileSystem.from_name(
 
 CACHE_DIR = "/root/SD"
 
-@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, secrets=[modal.Secret.from_name("jupyter secrets")], gpu=GPU, timeout=TIMEOUT)
+@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, gpu="None", timeout=60)
 def run_jupyter():
     jupyter_port = 8888
     with modal.forward(jupyter_port) as tunnel:
@@ -28,7 +28,7 @@ def run_jupyter():
                 "--NotebookApp.allow_origin='*'",
                 "--NotebookApp.allow_remote_access=1",
             ],
-            env={**os.environ, "JUPYTER_TOKEN": token},
+            env={**os.environ, "JUPYTER_TOKEN": "321"},
         )
 
         print(f"Jupyter available at => {tunnel.url}")
