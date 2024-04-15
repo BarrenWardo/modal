@@ -1,48 +1,50 @@
-# ---
-# args: ["--timeout", 10]
-# ---
-
-# ## Overview
-#
-# Quick snippet showing how to connect to a Jupyter notebook server running inside a Modal container,
-# especially useful for exploring the contents of Modal Volumes.
-# This uses [Modal Tunnels](https://modal.com/docs/guide/tunnels#tunnels-beta)
-# to create a tunnel between the running Jupyter instance and the internet.
-#
-# If you want to your Jupyter notebook to run _locally_ and execute remote Modal Functions in certain cells, see the `basic.ipynb` example :)
-
 import os
 import subprocess
-import time
 
 import modal
 
 stub = modal.Stub(
     image=modal.Image.debian_slim().pip_install(
-        "jupyter"
+        "jupyter",
     )
 )
-volume = modal.Volume.from_name(
-    "jupyter", create_if_missing=True
+nfs = modal.NetworkFileSystem.from_name(
+    "sd", create_if_missing=True
 )
 
-CACHE_DIR = "/root/cache"
-JUPYTER_TOKEN = "1234"  # Change me to something non-guessable!
+CACHE_DIR = "/root/SD"
+JUPYTER_TOKEN = "12345"
 
+# Define GPU configurations
+GPU = "t4"
 
-@stub.function(volumes={CACHE_DIR: volume})
+# Define timeout
+TIMEOUT = 3600  # Timeout set to 1 hour (3600 seconds)
+
+# Function to get GPU configuration
+def get_gpu_config(gpu_name):
+    if gpu_name == "t4":
+        return modal.gpu.T4()
+    elif gpu_name == "l4":
+        return modal.gpu.L4()
+    elif gpu_name == "a100":
+        return modal.gpu.A100()
+    elif gpu_name == "h100":
+        return modal.gpu.H100()
+    elif gpu_name == "a10g":
+        return modal.gpu.A10G()
+    elif gpu_name == "any":
+        return modal.gpu.Any()
+    else:
+        return None
+
+@stub.function(network_file_systems={CACHE_DIR: nfs}, gpu=get_gpu_config(GPU) if GPU else None, timeout=TIMEOUT)
 def seed_volume():
-    volume.commit()
+    pass
 
 
-# This is all that's needed to create a long-lived Jupyter server process in Modal
-# that you can access in your Browser through a secure network tunnel.
-# This can be useful when you want to interactively engage with Volume contents
-# without having to download it to your host computer.
-
-
-@stub.function(concurrency_limit=1, volumes={CACHE_DIR: volume}, timeout=1_500)
-def run_jupyter(timeout: int):
+@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, gpu=get_gpu_config(GPU) if GPU else None, timeout=TIMEOUT)
+def run_jupyter():
     jupyter_port = 8888
     with modal.forward(jupyter_port) as tunnel:
         jupyter_process = subprocess.Popen(
@@ -60,27 +62,10 @@ def run_jupyter(timeout: int):
         )
 
         print(f"Jupyter available at => {tunnel.url}")
-
-        try:
-            end_time = time.time() + timeout
-            while time.time() < end_time:
-                time.sleep(5)
-            print(f"Reached end of {timeout} second timeout period. Exiting...")
-        except KeyboardInterrupt:
-            print("Exiting...")
-        finally:
-            jupyter_process.kill()
+        jupyter_process.wait()
 
 
 @stub.local_entrypoint()
-def main(timeout: int = 10_000):
-    # Write some images to a volume, for demonstration purposes.
-    seed_volume.remote()
-    # Run the Jupyter Notebook server
-    run_jupyter.remote(timeout=timeout)
-
-
-# Doing `modal run jupyter_inside_modal.py` will run a Modal app which starts
-# the Juypter server at an address like https://u35iiiyqp5klbs.r3.modal.host.
-# Visit this address in your browser, and enter the security token
-# you set for `JUPYTER_TOKEN`.
+def main():
+    seed_volume.remote()  
+    run_jupyter.remote()
