@@ -1,12 +1,7 @@
 import os
 import subprocess
+import time
 import modal
-
-def extract_jupyter_secrets():
-    token = os.environ.get("Token")
-    gpu = os.environ.get("GPU")
-    timeout = int(os.environ.get("Timeout", 3600))
-    return token, gpu, timeout
 
 stub = modal.Stub(
     image=modal.Image.debian_slim().pip_install(
@@ -23,17 +18,12 @@ CACHE_DIR = "/root/SD"
 def get_secrets():
     token = os.environ.get("Token")
     gpu = os.environ.get("GPU")
-    timeout = int(os.environ.get("Timeout", 3600))
+    timeout = int(os.environ.get("Timeout"))
     return token, gpu, timeout
 
-@stub.function(network_file_systems={CACHE_DIR: nfs})
-def seed_volume():
-    pass
-
 @stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs})
-def run_jupyter(token, gpu, timeout):
+def run_jupyter(token: str, gpu: str, timeout: int):
     jupyter_port = 8888
-
     with modal.forward(jupyter_port) as tunnel:
         jupyter_process = subprocess.Popen(
             [
@@ -50,10 +40,18 @@ def run_jupyter(token, gpu, timeout):
         )
 
         print(f"Jupyter available at => {tunnel.url}")
-        jupyter_process.wait()
+
+        try:
+            end_time = time.time() + timeout
+            while time.time() < end_time:
+                time.sleep(5)
+            print(f"Reached end of {timeout} second timeout period. Exiting...")
+        except KeyboardInterrupt:
+            print("Exiting...")
+        finally:
+            jupyter_process.kill()
 
 @stub.local_entrypoint()
 def main():
     token, gpu, timeout = get_secrets()
-    seed_volume.remote()  
     run_jupyter.remote(token, gpu, timeout)
