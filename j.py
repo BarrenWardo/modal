@@ -54,4 +54,4 @@ def run_jupyter(token: str, gpu: str, timeout: int):
 @stub.local_entrypoint()
 def main():
     token, gpu, timeout = get_secrets()
-    run_jupyter.remote(token, gpu, timeout)
+    run_jupyter.remote(token, gpu=gpu, timeout=timeout)
