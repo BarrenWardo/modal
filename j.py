@@ -1,6 +1,5 @@
 import os
 import subprocess
-
 import modal
 
 stub = modal.Stub(
@@ -13,40 +12,16 @@ nfs = modal.NetworkFileSystem.from_name(
 )
 
 CACHE_DIR = "/root/SD"
-# Define the name of the secret containing the Jupyter token
-JUPYTER_TOKEN_SECRET_NAME = "JLT"
-
-# Define GPU configurations
-GPU = "None"
-
-# Define timeout
-TIMEOUT = 3600  # Timeout set to 1 hour (3600 seconds)
-
-# Function to get GPU configuration
-def get_gpu_config(gpu_name):
-    if gpu_name == "t4":
-        return modal.gpu.T4()
-    elif gpu_name == "l4":
-        return modal.gpu.L4()
-    elif gpu_name == "a100":
-        return modal.gpu.A100()
-    elif gpu_name == "h100":
-        return modal.gpu.H100()
-    elif gpu_name == "a10g":
-        return modal.gpu.A10G()
-    elif gpu_name == "any":
-        return modal.gpu.Any()
-    else:
-        return None
 
 @stub.function(network_file_systems={CACHE_DIR: nfs})
 def seed_volume():
     pass
 
-
-@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, gpu=get_gpu_config(GPU) if GPU else None, timeout=TIMEOUT, secrets=[modal.Secret.from_name(JUPYTER_TOKEN_SECRET_NAME)])
+@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, timeout=int(os.environ.get("Timeout", 3600)), secrets=[modal.Secret.from_name("jupyter secrets"), modal.Secret.from_name("GPU")])
 def run_jupyter():
     jupyter_port = 8888
+    gpu_secret = os.environ.get("GPU", None)
+
     with modal.forward(jupyter_port) as tunnel:
         jupyter_process = subprocess.Popen(
             [
@@ -59,12 +34,11 @@ def run_jupyter():
                 "--NotebookApp.allow_origin='*'",
                 "--NotebookApp.allow_remote_access=1",
             ],
-            env={**os.environ, "JUPYTER_TOKEN": os.environ[JUPYTER_TOKEN_SECRET_NAME]},
+            env={**os.environ, "JUPYTER_TOKEN": os.environ.get("Token")},
         )
 
         print(f"Jupyter available at => {tunnel.url}")
         jupyter_process.wait()
-
 
 @stub.local_entrypoint()
 def main():
