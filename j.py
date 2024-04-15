@@ -2,6 +2,13 @@ import os
 import subprocess
 import modal
 
+def import_jupyter_secrets():
+    secrets = modal.Secret.from_name("jupyter secrets")
+    token = os.environ.get("Token")
+    gpu = os.environ.get("GPU")
+    timeout = int(os.environ.get("Timeout", 3600))
+    return token, gpu, timeout
+
 stub = modal.Stub(
     image=modal.Image.debian_slim().pip_install(
         "jupyter",
@@ -17,10 +24,9 @@ CACHE_DIR = "/root/SD"
 def seed_volume():
     pass
 
-@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs}, timeout=int(os.environ.get("Timeout", 3600)), secrets=[modal.Secret.from_name("jupyter secrets"), modal.Secret.from_name("GPU")])
-def run_jupyter():
+@stub.function(concurrency_limit=1, network_file_systems={CACHE_DIR: nfs})
+def run_jupyter(token, gpu, timeout):
     jupyter_port = 8888
-    gpu_secret = os.environ.get("GPU", None)
 
     with modal.forward(jupyter_port) as tunnel:
         jupyter_process = subprocess.Popen(
@@ -34,7 +40,7 @@ def run_jupyter():
                 "--NotebookApp.allow_origin='*'",
                 "--NotebookApp.allow_remote_access=1",
             ],
-            env={**os.environ, "JUPYTER_TOKEN": os.environ.get("Token")},
+            env={**os.environ, "JUPYTER_TOKEN": token},
         )
 
         print(f"Jupyter available at => {tunnel.url}")
@@ -42,5 +48,6 @@ def run_jupyter():
 
 @stub.local_entrypoint()
 def main():
+    token, gpu, timeout = import_jupyter_secrets()
     seed_volume.remote()  
-    run_jupyter.remote()
+    run_jupyter.remote(token, gpu, timeout)
