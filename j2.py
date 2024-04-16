@@ -2,7 +2,11 @@ import os
 import subprocess
 import modal
 
-stub = modal.Stub()
+stub = modal.Stub(
+    image=modal.Image.debian_slim().pip_install(
+        "jupyter",
+    )
+)
 volume = modal.Volume.from_name("sd-volume", create_if_missing=True)
 
 @stub.function(volumes={"/root/SD": volume})
