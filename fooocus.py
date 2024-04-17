@@ -3,7 +3,7 @@ import subprocess
 import modal
 
 stub = modal.Stub(
-    image=modal.Image.debian_slim()
+    image=modal.Image.debian_slim(python_version="3.11")
     .apt_install(
         "wget",
         "git",
@@ -30,7 +30,7 @@ stub = modal.Stub(
         "pygit2==1.12.2",
         "opencv-contrib-python==4.8.0.74",
         "httpx==0.24.1",
-        "onnxruntime==1.17.3",
+        "onnxruntime",
         "timm==0.9.2",
         gpu="t4",
     )
