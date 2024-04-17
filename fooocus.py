@@ -33,6 +33,7 @@ def run_fooocus():
                 "entry_with_update.py",
                 f"--port={fooocus_port}",
             ],
+            cwd="Fooocus"
         )
 
         print(f"Fooocus available at => {tunnel.url}")
