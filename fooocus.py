@@ -28,7 +28,7 @@ def run_fooocus():
     fooocus_port = 7860
     with modal.forward(fooocus_port) as tunnel:
         fooocus_process = f"""
-        cd Fooocus && python entry_with_update.py --port {fooocus_port}
+        cd /Fooocus && python entry_with_update.py --port {fooocus_port}
         """
         subprocess.Popen(fooocus_process, shell=True)
 
