@@ -33,10 +33,8 @@ stub = modal.Stub(
         "onnxruntime",
         "timm==0.9.2",
         gpu="t4",
-    )
-    
+    )  
 )
-
 @stub.function(
         cpu=4,
         gpu="t4",
@@ -47,10 +45,7 @@ stub = modal.Stub(
 )
 def run_fooocus():
     fooocus_port = 7860
-#    with modal.forward(fooocus_port) as tunnel:
         fooocus_process = f"""
         cd /Fooocus && python entry_with_update.py --listen --port {fooocus_port} --share
         """
         subprocess.Popen(fooocus_process, shell=True)
-
-#        print(f"Fooocus available at => {tunnel.url}")
