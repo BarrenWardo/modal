@@ -27,14 +27,10 @@ stub = modal.Stub(
 def run_fooocus():
     fooocus_port = 7860
     with modal.forward(fooocus_port) as tunnel:
-        fooocus_process = subprocess.Popen(
-            [
-                "python",
-                "entry_with_update.py",
-                f"--port={fooocus_port}",
-            ],
-            cwd="Fooocus"
-        )
+        fooocus_process = f"""
+        cd Fooocus && python entry_with_update.py --port {fooocus_port}
+        """
+        subprocess.Popen(fooocus_process, shell=True)
 
         print(f"Fooocus available at => {tunnel.url}")
         fooocus_process.wait()
