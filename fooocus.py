@@ -2,6 +2,8 @@ import os
 import subprocess
 import modal
 
+from modal import Image, Stub, web_server
+
 fooocus_port = 7860
 
 stub = modal.Stub(
