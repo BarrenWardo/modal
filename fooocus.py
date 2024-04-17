@@ -45,7 +45,7 @@ stub = modal.Stub(
 )
 def run_fooocus():
     fooocus_port = 7860
-        fooocus_process = f"""
-        cd /Fooocus && python entry_with_update.py --listen --port {fooocus_port} --share
-        """
-        subprocess.Popen(fooocus_process, shell=True)
+    fooocus_process = f"""
+    cd /Fooocus && python entry_with_update.py --listen --port {fooocus_port} --share
+    """
+    subprocess.Popen(fooocus_process, shell=True)
