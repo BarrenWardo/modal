@@ -2,6 +2,8 @@ import os
 import subprocess
 import modal
 
+fooocus_port = 7860
+
 stub = modal.Stub(
     image=modal.Image.debian_slim(python_version="3.11")
     .apt_install(
@@ -43,8 +45,8 @@ stub = modal.Stub(
         timeout=3600,
         concurrency_limit=1,
 )
+@web_server(port=fooocus_port, startup_timeout=180)
 def run_fooocus():
-    fooocus_port = 7860
     fooocus_process = f"""
     cd /Fooocus && python entry_with_update.py --listen --port {fooocus_port} --share
     """
