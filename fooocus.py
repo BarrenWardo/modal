@@ -2,7 +2,7 @@ import os
 import subprocess
 import modal
 
-from modal import Image, Stub, web_server
+from modal import web_server
 
 fooocus_port = 7860
 
