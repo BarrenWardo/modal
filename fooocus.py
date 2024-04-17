@@ -33,7 +33,6 @@ def run_fooocus():
         subprocess.Popen(fooocus_process, shell=True)
 
         print(f"Fooocus available at => {tunnel.url}")
-        fooocus_process.wait()
 
 @stub.local_entrypoint()
 def main():
