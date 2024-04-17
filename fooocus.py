@@ -30,7 +30,7 @@ stub = modal.Stub(
         "pygit2==1.12.2",
         "opencv-contrib-python==4.8.0.74",
         "httpx==0.24.1",
-        "onnxruntime==1.16.3",
+        "onnxruntime==1.17.3",
         "timm==0.9.2",
         gpu="t4",
     )
