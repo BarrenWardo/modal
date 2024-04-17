@@ -54,7 +54,3 @@ def run_fooocus():
         subprocess.Popen(fooocus_process, shell=True)
 
         print(f"Fooocus available at => {tunnel.url}")
-
-@stub.local_entrypoint()
-def main():
-    run_fooocus.remote()
