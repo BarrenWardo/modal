@@ -44,7 +44,6 @@ stub = modal.Stub(
         gpu="t4",
         memory=256,
         keep_warm=1,
-        timeout=3600,
         concurrency_limit=1,
 )
 @web_server(port=fooocus_port, startup_timeout=180)
