@@ -27,7 +27,6 @@ stub = modal.Stub(
         "torch", 
         "torchvision", 
         "torchaudio",
-        "InvokeAI",
     )
 )
 
@@ -49,6 +48,6 @@ volume = modal.Volume.from_name(
 
 def run_invokeai():
     invoke_start = f"""
-    invokeai-web --root {vol_dir}
+    cd {vol_dir} && pip install InvokeAI --use-pep517 --extra-index-url https://download.pytorch.org/whl/cu121 && invokeai-web --root {vol_dir}
     """
     subprocess.Popen(invoke_start, shell=True)
