@@ -6,7 +6,8 @@ from modal import web_server
 
 server_timeout = 600
 modal_gpu = "t4"
-DIR = "/root/invokeai"
+vol_dir = "/root/invokeai"
+invoke_port = 9090
 
 stub = modal.Stub(
     image=modal.Image.debian_slim(python_version="3.11")
@@ -40,14 +41,14 @@ volume = modal.Volume.from_name(
     memory=256,
     keep_warm=1,
     concurrency_limit=1,
-    volumes={DIR: volume},
+    volumes={vol_dir: volume},
     _allow_background_volume_commits=True,
 )
 
-@web_server(port=9090, startup_timeout=server_timeout)
+@web_server(port=invoke_port, startup_timeout=server_timeout)
 
 def run_invokeai():
     invoke_start = f"""
-    cd {DIR} && invokeai-web --root {DIR}
+    cd {vol_dir} && invokeai-web
     """
     subprocess.Popen(invoke_start, shell=True)
