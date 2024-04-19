@@ -22,9 +22,9 @@ stub = modal.Stub(
         "libopencv-dev",
     )  
     .pip_install(
-    "pypatchmatch",
-    "xformers",
-    "InvokeAI",
+        "pypatchmatch",
+        "xformers",
+        "InvokeAI",
     )
 )
 
