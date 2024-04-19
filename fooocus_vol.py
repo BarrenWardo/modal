@@ -36,9 +36,9 @@ volume = modal.Volume.from_name(
 @stub.function(
         cpu=2,
         gpu=modal_gpu,
-        memory=64,
+        memory=128,
         keep_warm=1,
-        concurrency_limit=3,
+        concurrency_limit=1,
         volumes={DIR: volume},
         _allow_background_volume_commits=True,
 )
