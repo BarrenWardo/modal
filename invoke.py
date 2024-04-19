@@ -23,7 +23,7 @@ stub = modal.Stub(
     )  
     .pip_install(
     "pypatchmatch",
-    "InvokeAI --use-pep517 --extra-index-url=https://download.pytorch.org/whl/cu121",
+    "InvokeAI",
     "xformers",
     )
 )
