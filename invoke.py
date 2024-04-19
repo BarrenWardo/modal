@@ -34,7 +34,7 @@ volume = modal.Volume.from_name(
     _allow_background_volume_commits=True,
 )
 
-@web_server(port=9090, startup_timeout=server_timeout)
+@modal.web_server(port=9090, startup_timeout=server_timeout)
 
 def run_invokeai():
     invoke_start = f"""
