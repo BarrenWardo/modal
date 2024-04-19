@@ -18,6 +18,10 @@ stub = modal.Stub(
         "python3-opencv",
         "libopencv-dev",
     )  
+    .pip_install(
+        "pypatchmatch",
+        "InvokeAI[xformers] --use-pep517 --extra-index-url https://download.pytorch.org/whl/cu121"
+    )
 )
 
 volume = modal.Volume.from_name(
@@ -38,6 +42,6 @@ volume = modal.Volume.from_name(
 
 def run_invokeai():
     invoke_start = f"""
-    pip install "InvokeAI[xformers]" --use-pep517 --extra-index-url https://download.pytorch.org/whl/cu121 && pip install pypatchmatch && invokeai-web --root {DIR}
+    invokeai-web --root {DIR}
     """
     subprocess.Popen(invoke_start, shell=True)
