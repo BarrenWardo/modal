@@ -2,6 +2,8 @@ import os
 import subprocess
 import modal
 
+from modal import web_server
+
 server_timeout = 600
 modal_gpu = "t4"
 DIR = "/root/invokeai"
@@ -42,7 +44,7 @@ volume = modal.Volume.from_name(
     _allow_background_volume_commits=True,
 )
 
-@modal.web_server(port=9090, startup_timeout=server_timeout)
+@web_server(port=9090, startup_timeout=server_timeout)
 
 def run_invokeai():
     invoke_start = f"""
