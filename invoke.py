@@ -21,7 +21,10 @@ stub = modal.Stub(
     .pip_install(
         "pypatchmatch",
         "xformers",
-        "InvokeAI --use-pep517 --extra-index-url https://download.pytorch.org/whl/cu121"
+        "torch", 
+        "torchvision", 
+        "torchaudio",
+        "InvokeAI",
     )
 )
 
@@ -43,6 +46,6 @@ volume = modal.Volume.from_name(
 
 def run_invokeai():
     invoke_start = f"""
-    invokeai-web --root {DIR}
+    cd {DIR} && invokeai-web --root {DIR}
     """
     subprocess.Popen(invoke_start, shell=True)
