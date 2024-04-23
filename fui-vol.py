@@ -44,6 +44,7 @@ app = modal.App(
         "torchdiffeq",
         "torchsde",
         "transformers==4.30.2",
+        "insightface",
     )
 )
 
