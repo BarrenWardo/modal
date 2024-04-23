@@ -14,7 +14,37 @@ app = modal.App(
         "git",
         "libgl1",
         "libglib2.0-0",
-    )  
+    )
+    .pip_install(
+        "GitPython",
+        "Pillow",
+        "accelerate",
+        "blendmodes",
+        "clean-fid",
+        "einops",
+        "facexlib",
+        "fastapi>=0.90.1",
+        "gradio==3.41.2",
+        "inflection",
+        "jsonmerge",
+        "kornia",
+        "lark",
+        "numpy",
+        "omegaconf",
+        "open-clip-torch",
+        "piexif",
+        "psutil",
+        "pytorch_lightning",
+        "requests",
+        "resize-right",
+        "safetensors",
+        "scikit-image>=0.19",
+        "tomesd",
+        "torch",
+        "torchdiffeq",
+        "torchsde",
+        "transformers==4.30.2",
+    )
 )
 
 volume = modal.Volume.from_name(
