@@ -70,10 +70,10 @@ def run_fui():
     fui_folder = os.path.join(fui_dir, "FUI")
     if os.path.exists(fui_folder):
         fui_start = f"""
-            cd {fui_folder} && git pull && pip install -r requirements.txt && python launch.py --listen --enable-insecure-extension-access
+            cd {fui_folder} && git pull && python launch.py --listen --enable-insecure-extension-access
         """
     else:
         fui_start = f"""
-            cd {fui_dir} && git clone https://github.com/BarrenWardo/FUI.git && cd FUI && pip install -r requirements.txt && python launch.py --listen --enable-insecure-extension-access
+            cd {fui_dir} && git clone https://github.com/BarrenWardo/FUI.git && cd FUI && python launch.py --listen --enable-insecure-extension-access
         """
     subprocess.Popen(fui_start, shell=True)
