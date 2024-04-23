@@ -35,7 +35,7 @@ volume = modal.Volume.from_name(
 @modal.web_server(port=7860, startup_timeout=server_timeout)
 
 def run_fui():
-    fui_folder = os.path.join(DIR, "FUI")
+    fui_folder = os.path.join(fui_dir, "FUI")
     if os.path.exists(fui_folder):
         fui_start = f"""
             cd {fui_folder} && git pull && pip install -r requirements.txt && python launch.py --listen --xformers --enable-insecure-extension-access --update-all-extensions
