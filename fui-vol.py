@@ -45,6 +45,7 @@ app = modal.App(
         "torchsde",
         "transformers==4.30.2",
         "insightface",
+        "xformers",
     )
 )
 
