@@ -47,6 +47,6 @@ volume = modal.Volume.from_name(
 
 def run_invokeai():
     invoke_start = f"""
-    invokeai-web --root {vol_dir} --host 0.0.0.0
+    invokeai-web --root {vol_dir} --port {invoke_port}
     """
     subprocess.Popen(invoke_start, shell=True)
