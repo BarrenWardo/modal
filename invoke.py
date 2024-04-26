@@ -9,7 +9,7 @@ invoke_port = 9090
 
 app = modal.App(
     "InvokeAI",
-    image=modal.Image.debian_slim(python_version="3.11")
+    image=modal.Image.debian_slim(python_version="3.12")
     .apt_install(
         "wget",
         "git",
