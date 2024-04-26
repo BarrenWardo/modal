@@ -2,8 +2,6 @@ import os
 import subprocess
 import modal
 
-from modal
-
 server_timeout = 1200
 modal_gpu = "t4"
 vol_dir = "/root/invokeai"
