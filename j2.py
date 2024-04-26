@@ -2,14 +2,35 @@ import os
 import subprocess
 import modal
 
-stub = modal.Stub(
-    image=modal.Image.debian_slim().pip_install(
+app = modal.App(
+    "Jupyter",
+    image=modal.Image.debian_slim()
+    .apt_install(
+        "wget",
+        "git",
+        "libgl1",
+        "libglib2.0-0",
+    )
+    .pip_install(
         "jupyter",
     )
 )
-volume = modal.Volume.from_name("sd-volume", create_if_missing=True)
+volume = modal.Volume.from_name("jupyter", create_if_missing=True)
 
-@stub.function(volumes={"/root/SD": volume})
+@app.function(
+    volumes={"/root/jupyter": volume},
+    #cpu=2,
+    #memory=128,
+    #gpu="any",
+    concurrency_limit=1,
+    allow_concurrent_inputs=100,
+    #container_idle_timeout=60,
+    timeout=1800,
+    #keep_warm=1,
+    enable_memory_snapshot=True,
+    _allow_background_volume_commits=True,
+)
+
 def run_jupyter():
     jupyter_port = 8888
     with modal.forward(jupyter_port) as tunnel:
@@ -29,13 +50,7 @@ def run_jupyter():
 
         print(f"Jupyter available at => {tunnel.url}")
         jupyter_process.wait()
-
-        # Reload volume to fetch latest changes
-        volume.reload()
-
-        # Commit any changes made during Jupyter session
-        volume.commit()
-
-@stub.local_entrypoint()
+        
+@app.local_entrypoint()
 def main():
     run_jupyter.remote()
