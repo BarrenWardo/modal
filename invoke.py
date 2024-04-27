@@ -41,7 +41,7 @@ volume = modal.Volume.from_name(
     _allow_background_volume_commits=True,
     allow_concurrent_inputs=100,
     timeout=server_timeout,
-    enable_memory_snapshot=True,
+    #enable_memory_snapshot=True,
 )
 
 @modal.web_server(port=invoke_port, startup_timeout=server_timeout)
