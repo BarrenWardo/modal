@@ -27,7 +27,7 @@ volume = modal.Volume.from_name("jupyter", create_if_missing=True)
     #container_idle_timeout=60,
     timeout=1800,
     #keep_warm=1,
-    enable_memory_snapshot=True,
+    #enable_memory_snapshot=True,
     _allow_background_volume_commits=True,
 )
 
