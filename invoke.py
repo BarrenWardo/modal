@@ -24,6 +24,9 @@ app = modal.App(
         "InvokeAI[xformers]",
         extra_index_url="https://download.pytorch.org/whl/cu121",
     )
+    .run_commands(
+       "mkdir invokeai" 
+    )
 )
 
 @app.function(
