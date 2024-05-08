@@ -24,6 +24,10 @@ app = modal.App(
         "InvokeAI[xformers]",
         extra_index_url="https://download.pytorch.org/whl/cu121",
     )
+    .run_commands(
+        "mkdir invokeai",
+        "wget -O https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/eb29b3a026dd50689059656265d54a89017cdd8f/invokeai.yaml invokeai/invokeai.yaml",
+    )
 )
 
 @app.function(
@@ -42,6 +46,6 @@ app = modal.App(
 
 def run_invokeai():
     invoke_start = f"""
-    mkdir invokeai && wget -O https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/eb29b3a026dd50689059656265d54a89017cdd8f/invokeai.yaml invokeai/invokeai.yaml && invokeai-web
+    invokeai-web
     """
     subprocess.Popen(invoke_start, shell=True)
