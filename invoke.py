@@ -37,7 +37,7 @@ app = modal.App(
     #enable_memory_snapshot=True,
 )
 
-@modal.web_server(9090)
+@modal.web_server(9090,startup_timeout=server_timeout)
 
 def run_invokeai():
     invoke_start = f"""
