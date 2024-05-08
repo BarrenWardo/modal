@@ -42,6 +42,6 @@ app = modal.App(
 
 def run_invokeai():
     invoke_start = f"""
-    wget -O https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/eb29b3a026dd50689059656265d54a89017cdd8f/invokeai.yaml invokeai/invokeai.yaml && invokeai-web
+    mkdir invokeai && wget -O https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/eb29b3a026dd50689059656265d54a89017cdd8f/invokeai.yaml invokeai/invokeai.yaml && invokeai-web
     """
     subprocess.Popen(invoke_start, shell=True)
