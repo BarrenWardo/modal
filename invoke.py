@@ -39,7 +39,6 @@ app = modal.App(
 )
 
 @modal.web_server(port=invoke_port, startup_timeout=server_timeout)
-@modal.asgi_app()
 
 def run_invokeai():
     invoke_start = f"""
