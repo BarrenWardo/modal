@@ -4,7 +4,6 @@ import modal
 
 server_timeout = 1200
 modal_gpu = "t4"
-invoke_port = 9090
 
 app = modal.App(
     "InvokeAI",
@@ -38,7 +37,7 @@ app = modal.App(
     #enable_memory_snapshot=True,
 )
 
-@modal.web_server(9090, startup_timeout=server_timeout)
+@modal.web_server(9090)
 
 def run_invokeai():
     invoke_start = f"""
