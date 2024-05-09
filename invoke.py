@@ -4,6 +4,7 @@ import modal
 
 server_timeout = 1200
 modal_gpu = "t4"
+DIR = "/root/invokeai"
 
 app = modal.App(
     "InvokeAI",
@@ -25,6 +26,10 @@ app = modal.App(
     )
 )
 
+volume = modal.Volume.from_name(
+    "invokeai"
+)
+
 @app.function(
     cpu=2,
     gpu=modal_gpu,
@@ -35,12 +40,14 @@ app = modal.App(
     allow_concurrent_inputs=100,
     timeout=server_timeout,
     #enable_memory_snapshot=True,
+    volumes={DIR: volume},
+    _allow_background_volume_commits=True,
 )
 
 @modal.web_server(9090,startup_timeout=server_timeout)
 
 def run_invokeai():
     invoke_start = f"""
-    mkdir invokeai && cd invokeai && wget https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/invokeai.yaml && invokeai-web
+    cd {DIR} && wget https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/invokeai.yaml && invokeai-web --root {DIR}
     """
     subprocess.Popen(invoke_start, shell=True)
