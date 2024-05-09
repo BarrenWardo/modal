@@ -35,7 +35,6 @@ volume = modal.Volume.from_name(
     memory=128,
     #keep_warm=1,
     concurrency_limit=1,
-    #_allow_background_volume_commits=True,
     allow_concurrent_inputs=100,
     timeout=server_timeout,
     #enable_memory_snapshot=True,
