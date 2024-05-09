@@ -27,8 +27,7 @@ app = modal.App(
 )
 
 volume = modal.Volume.from_name(
-    "invokeai"
-)
+    "invokeai", create_if_missing=True)
 
 @app.function(
     cpu=2,
