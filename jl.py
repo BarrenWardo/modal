@@ -3,7 +3,7 @@ import subprocess
 import modal
 
 app = modal.App(
-    "Jupyter",
+    "JupyterLab",
     image=modal.Image.debian_slim()
     .apt_install(
         "wget",
@@ -12,13 +12,13 @@ app = modal.App(
         "libglib2.0-0",
     )
     .pip_install(
-        "jupyter",
+        "jupyterlab",
     )
 )
-volume = modal.Volume.from_name("jupyter", create_if_missing=True)
+volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
 
 @app.function(
-    volumes={"/root/jupyter": volume},
+    volumes={"/root/jupyterlab": volume},
     #cpu=2,
     #memory=128,
     #gpu="any",
@@ -31,26 +31,26 @@ volume = modal.Volume.from_name("jupyter", create_if_missing=True)
     _allow_background_volume_commits=True,
 )
 
-def run_jupyter():
-    jupyter_port = 8888
-    with modal.forward(jupyter_port) as tunnel:
-        jupyter_process = subprocess.Popen(
+def run_jupyterlab():
+    jupyterlab_port = 8888
+    with modal.forward(jupyterlab_port) as tunnel:
+        jupyterlab_process = subprocess.Popen(
             [
                 "jupyter",
-                "notebook",
+                "lab",
                 "--no-browser",
                 "--allow-root",
                 "--ip=0.0.0.0",
-                f"--port={jupyter_port}",
-                "--NotebookApp.allow_origin='*'",
-                "--NotebookApp.allow_remote_access=1",
+                f"--port={jupyterlab_port}",
+                "--ServerApp.allow_origin='*'",
+                "--ServerApp.allow_remote_access=1",
             ],
-            env={**os.environ, "JUPYTER_TOKEN": "321"},
+            env={**os.environ, "JUPYTERLAB_TOKEN": "321"},
         )
 
-        print(f"Jupyter available at => {tunnel.url}")
-        jupyter_process.wait()
+        print(f"JupyterLab available at => {tunnel.url}")
+        jupyterlab_process.wait()
         
 @app.local_entrypoint()
 def main():
-    run_jupyter.remote()
+    run_jupyterlab.remote()
