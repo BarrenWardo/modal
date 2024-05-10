@@ -51,6 +51,6 @@ def run_jupyterlab():
         print(f"JupyterLab available at => {tunnel.url}")
         jupyterlab_process.wait()
         
-@app.local_entrypoint()
+# @app.local_entrypoint()
 def main():
     run_jupyterlab.remote()
