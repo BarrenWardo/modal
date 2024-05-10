@@ -24,7 +24,7 @@ volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
     #gpu="any",
     concurrency_limit=1,
     allow_concurrent_inputs=100,
-    #container_idle_timeout=60,
+    container_idle_timeout=120,
     timeout=1800,
     #keep_warm=1,
     #enable_memory_snapshot=True,
