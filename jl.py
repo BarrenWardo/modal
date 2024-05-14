@@ -34,21 +34,22 @@ volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
 def run_jupyterlab():
     jupyterlab_port = 8888
     with modal.forward(jupyterlab_port) as tunnel:
-    jupyterlab_process = subprocess.Popen(
-        [
-            "jupyter",
-            "lab",
-            "--no-browser",
-            "--allow-root",
-            "--ip=0.0.0.0",
-            f"--port={jupyterlab_port}",
-            "--ServerApp.allow_origin='*'",
-            "--ServerApp.allow_remote_access=1",
-        ],
-        env={**os.environ, "JUPYTERLAB_TOKEN": "321"},
-    )
-    print(f"JupyterLab available at => {tunnel.url}")
-    jupyterlab_process.wait()
+        jupyterlab_process = subprocess.Popen(
+            [
+                "jupyter",
+                "lab",
+                "--no-browser",
+                "--allow-root",
+                "--ip=0.0.0.0",
+                f"--port={jupyterlab_port}",
+                "--ServerApp.allow_origin='*'",
+                "--ServerApp.allow_remote_access=1",
+            ],
+            env={**os.environ, "JUPYTERLAB_TOKEN": "321"},
+        )
+        
+        print(f"JupyterLab available at => {tunnel.url}")
+        jupyterlab_process.wait()
         
 @app.local_entrypoint()
 def main():
