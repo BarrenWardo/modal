@@ -48,6 +48,6 @@ def run_jupyterlab():
     )
     jupyterlab_process.wait()
         
-@modal.web_server(jupyterlab_port)
+@app.local_entrypoint()
 def main():
     run_jupyterlab.remote()
