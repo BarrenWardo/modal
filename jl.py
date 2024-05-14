@@ -31,8 +31,8 @@ volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
     _allow_background_volume_commits=True,
 )
 
-jupyterlab_port = 8888
 def run_jupyterlab():
+    jupyterlab_port = 8888
     with modal.forward(jupyterlab_port) as tunnel:
     jupyterlab_process = subprocess.Popen(
         [
