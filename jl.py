@@ -2,6 +2,8 @@ import os
 import subprocess
 import modal
 
+custom_token = "321"
+
 app = modal.App(
     "JupyterLab",
     image=modal.Image.debian_slim()
@@ -15,6 +17,7 @@ app = modal.App(
         "jupyterlab",
     )
 )
+
 volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
 
 @app.function(
@@ -45,7 +48,7 @@ def run_jupyterlab():
                 "--ServerApp.allow_origin='*'",
                 "--ServerApp.allow_remote_access=1",
             ],
-            env={**os.environ, "JUPYTERLAB_TOKEN": "321"},
+            env={**os.environ, "JUPYTERLAB_TOKEN": custom_token},
         )
         
         print(f"JupyterLab available at => {tunnel.url}")
