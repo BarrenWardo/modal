@@ -16,19 +16,22 @@ app = modal.App(
     .pip_install(
         "jupyterlab",
     )
+    .workdir(
+        "/root/jl"
+    )
 )
 
 volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
 
 @app.function(
-    volumes={"/root/jupyterlab": volume},
+    volumes={"/root/jl": volume},
     # cpu=2,
     # memory=128,
     # gpu="any",
     concurrency_limit=1,
     allow_concurrent_inputs=100,
     container_idle_timeout=120,
-    timeout=1800,
+    timeout=3600,
     # keep_warm=1,
     _allow_background_volume_commits=True,
 )
