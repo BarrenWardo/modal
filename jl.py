@@ -2,7 +2,7 @@ import os
 import subprocess
 import modal
 
-custom_token = "321"
+custom_token = os.getenv("CUSTOM_TOKEN", "321")
 
 app = modal.App(
     "JupyterLab",
@@ -23,17 +23,15 @@ volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
 @app.function(
     volumes={"/root/jupyterlab": volume},
     #cpu=2,
-    #memory=128,
+    #memory=4096,
     #gpu="any",
     concurrency_limit=1,
     allow_concurrent_inputs=100,
     container_idle_timeout=120,
     timeout=1800,
     #keep_warm=1,
-    #enable_memory_snapshot=True,
     _allow_background_volume_commits=True,
 )
-
 def run_jupyterlab():
     jupyterlab_port = 8888
     with modal.forward(jupyterlab_port) as tunnel:
