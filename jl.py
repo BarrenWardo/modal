@@ -6,6 +6,7 @@ import re
 app = modal.App(
     "JupyterLab",
     image=modal.Image.debian_slim()
+    .micromamba()
     .apt_install(
         "wget",
         "git",
@@ -22,7 +23,7 @@ volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
 @app.function(
     volumes={"/root/jupyterlab": volume},
     # cpu=2,
-    # memory=4096,
+    # memory=128,
     # gpu="any",
     concurrency_limit=1,
     allow_concurrent_inputs=100,
