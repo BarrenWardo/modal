@@ -2,7 +2,7 @@ import os
 import subprocess
 import modal
 
-custom_token = os.getenv("CUSTOM_TOKEN", "321")
+custom_token = "321"
 
 app = modal.App(
     "JupyterLab",
