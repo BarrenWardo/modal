@@ -16,9 +16,6 @@ app = modal.App(
     .pip_install(
         "jupyterlab",
     )
-    .workdir(
-        "/root/jl"
-    )
 )
 
 volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
