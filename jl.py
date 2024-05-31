@@ -12,9 +12,11 @@ app = modal.App(
         "git",
         "libgl1",
         "libglib2.0-0",
+        "htop",
     )
     .pip_install(
         "jupyterlab",
+        "nvitop",
     )
 )
 
