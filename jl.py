@@ -53,25 +53,7 @@ def run_jupyterlab():
             text=True
         )
 
-        while True:
-            output = jupyterlab_process.stdout.readline()
-            if output:
-                print(output.strip())
-                # Parse the URL from the logs
-                if "http://127.0.0.1:8888/lab" in output:
-                    url = re.search(r'http://127.0.0.1:8888/lab\?token=\w+', output)
-                    if url:
-                        url = url.group(0)
-                        print(f"JupyterLab available at => {tunnel.url}")
-                        print(f"Access JupyterLab at {url.replace('http://127.0.0.1:8888', tunnel.url)}")
-                    else:
-                        # If there's no token in the URL
-                        print(f"JupyterLab available at => {tunnel.url}")
-                        print(f"Access JupyterLab at {tunnel.url}/lab")
-                    break
-            elif jupyterlab_process.poll() is not None:
-                break
-
+        print(f"JupyterLab available at => {tunnel.url}")
         jupyterlab_process.wait()
 
 @app.local_entrypoint()
