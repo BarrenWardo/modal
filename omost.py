@@ -17,9 +17,6 @@ app = modal.App(
         "libglib2.0-0",
     )
     .pip_install(
-        "torch",
-        "torchvision",
-        extra_index_url="https://download.pytorch.org/whl/cu121",
         "diffusers==0.28.0",
         "transformers==4.41.1",
         "gradio==4.31.5",
@@ -33,6 +30,8 @@ app = modal.App(
         "einops",
         "torch",
         "peft",
+        "torchvision",
+        extra_index_url="https://download.pytorch.org/whl/cu121",
     )
 )
 
