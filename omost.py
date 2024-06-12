@@ -16,8 +16,10 @@ app = modal.App(
         "libgl1",
         "libglib2.0-0",
     )
+    .run_commands(
+        "pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121"
+    )
     .pip_install(
-        "pip",
         "diffusers",
         "transformers",
         "gradio",
@@ -30,9 +32,6 @@ app = modal.App(
         "pillow",
         "einops",
         "peft",
-    )
-    .run_commands(
-        "pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121"
     )
 )
 
