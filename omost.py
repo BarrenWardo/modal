@@ -31,7 +31,7 @@ app = modal.App(
         "torch",
         "peft",
         "torchvision",
-        extra_index_url="https://download.pytorch.org/whl/cu121",
+        index_url="https://download.pytorch.org/whl/cu121",
     )
 )
 
@@ -62,6 +62,7 @@ def run_omost():
         """
     else:
         omost_process = f"""
-            cd {DIR} && git clone https://github.com/lllyasviel/Omost.git && cd Omost && python gradio_app.py
+            cd {DIR} && git clone https://github.com/BarrenWardo/Omost.git && cd Omost && python gradio_app.py
+            
         """
     subprocess.Popen(omost_process, shell=True)
