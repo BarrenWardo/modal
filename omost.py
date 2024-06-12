@@ -18,12 +18,12 @@ app = modal.App(
     )
     .pip_install(
         "pip"
-        "diffusers==0.28.0",
-        "transformers==4.41.1",
-        "gradio==4.31.5",
-        "bitsandbytes==0.43.1",
-        "accelerate==0.30.1",
-        "protobuf==3.20",
+        "diffusers",
+        "transformers",
+        "gradio",
+        "bitsandbytes",
+        "accelerate",
+        "protobuf",
         "opencv-python",
         "tensorboardX",
         "safetensors",
