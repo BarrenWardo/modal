@@ -17,7 +17,7 @@ app = modal.App(
         "libglib2.0-0",
     )
     .pip_install(
-        "pip"
+        "pip",
         "diffusers",
         "transformers",
         "gradio",
