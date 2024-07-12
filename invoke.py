@@ -5,7 +5,7 @@ import modal
 # Initialize the Modal app
 app = modal.App(
     "InvokeAI",
-    image=modal.Image.debian_slim(python_version="3.11")
+    image=modal.Image.debian_slim(python_version="3.10")
     .apt_install(
         "wget",
         "git",
@@ -36,7 +36,6 @@ app = modal.App(
     timeout=10800,  # 3 hours
     # keep_warm=1,
 )
-
 def run_invokeai():
     invokeai_port = 9090
     with modal.forward(invokeai_port) as tunnel:
@@ -57,4 +56,3 @@ def run_invokeai():
 @app.local_entrypoint()
 def main():
     run_invokeai.remote()
-
