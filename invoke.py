@@ -2,13 +2,10 @@ import os
 import subprocess
 import modal
 
-server_timeout = 1200
-modal_gpu = "t4"
-DIR = "/root/invokeai"
-
+# Initialize the Modal app
 app = modal.App(
     "InvokeAI",
-    image=modal.Image.debian_slim(python_version="3.11")
+    image=modal.Image.debian_slim()
     .apt_install(
         "wget",
         "git",
@@ -18,34 +15,46 @@ app = modal.App(
         "build-essential",
         "python3-opencv",
         "libopencv-dev",
-    )  
+    )
     .pip_install(
-        "pypatchmatch",
         "InvokeAI[xformers]",
-        extra_index_url="https://download.pytorch.org/whl/cu121",
+        "torch",
+        "torchvision",
+        "torchaudio",
+        "pypatchmatch",
     )
 )
 
-volume = modal.Volume.from_name(
-    "invokeai", create_if_missing=True)
-
+# Define the function to run InvokeAI
 @app.function(
-    cpu=2,
-    gpu=modal_gpu,
-    memory=128,
-    #keep_warm=1,
+    # cpu=2,
+    # memory=128,
+    gpu="t4",
     concurrency_limit=1,
     allow_concurrent_inputs=100,
-    timeout=server_timeout,
-    #enable_memory_snapshot=True,
-    volumes={DIR: volume},
-    _allow_background_volume_commits=True,
+    container_idle_timeout=1200,
+    timeout=10800,  # 3 hours
+    # keep_warm=1,
 )
 
-@modal.web_server(9090,startup_timeout=server_timeout)
-
 def run_invokeai():
-    invoke_start = f"""
-    invokeai-web --root {DIR} --config {DIR}/invokeai.yaml
-    """
-    subprocess.Popen(invoke_start, shell=True)
+    invokeai_port = 9090
+    with modal.forward(invokeai_port) as tunnel:
+        invokeai_process = subprocess.Popen(
+            [
+                "invokeai-web",
+            ],
+            env=os.environ,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        print(f"InvokeAi available at => {tunnel.url}")
+        invokeai_process.wait()
+
+# Define the local entry point
+@app.local_entrypoint()
+def main():
+    run_invokeai.remote()
+
