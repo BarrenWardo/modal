@@ -42,6 +42,7 @@ def run_invokeai():
         invokeai_process = subprocess.Popen(
             [
                 "invokeai-web",
+                "--host", "0.0.0.0",
             ],
             env=os.environ,
             stdout=subprocess.PIPE,
@@ -49,10 +50,12 @@ def run_invokeai():
             text=True
         )
 
-        print(f"InvokeAi available at => {tunnel.url}")
+        print(f"InvokeAI available at => {tunnel.url}")
         invokeai_process.wait()
 
 # Define the local entry point
 @app.local_entrypoint()
 def main():
     run_invokeai.remote()
+    while True:
+        pass
