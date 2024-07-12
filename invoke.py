@@ -5,7 +5,7 @@ import modal
 # Initialize the Modal app
 app = modal.App(
     "InvokeAI",
-    image=modal.Image.debian_slim()
+    image=modal.Image.debian_slim(python_version="3.11")
     .apt_install(
         "wget",
         "git",
