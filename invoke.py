@@ -39,11 +39,40 @@ app = modal.App(
 def run_invokeai():
     invokeai_port = 9090
     with modal.forward(invokeai_port) as tunnel:
-        invokeai_process = subprocess.Popen(
+        # Create the directory
+        mkdir_process = subprocess.Popen(
+            ["mkdir", "-p", "invokeai"],
+            env=os.environ,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        mkdir_stdout, mkdir_stderr = mkdir_process.communicate()
+        if mkdir_process.returncode != 0:
+            print(f"Error creating directory: {mkdir_stderr}")
+            return
+
+        # Download the configuration file using wget
+        wget_process = subprocess.Popen(
             [
-                "invokeai-web",
-                "--host", "0.0.0.0",
+                "wget",
+                "https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/invokeai.yaml",
+                "-O",
+                "invokeai/invokeai.yaml",
             ],
+            env=os.environ,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        wget_stdout, wget_stderr = wget_process.communicate()
+        if wget_process.returncode != 0:
+            print(f"Error downloading configuration file: {wget_stderr}")
+            return
+
+        # Start the InvokeAI web server
+        invokeai_process = subprocess.Popen(
+            ["invokeai-web"],
             env=os.environ,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -57,5 +86,5 @@ def run_invokeai():
 @app.local_entrypoint()
 def main():
     run_invokeai.remote()
-    while True:
-        pass
+#    while True:
+#        pass
