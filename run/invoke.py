@@ -26,6 +26,8 @@ app = modal.App(
         "torchvision",
         "torchaudio",
         "pypatchmatch",
+        extra_index_url="https://pypi.org/simple",
+        #force_build=True,
     )
 )
 
@@ -34,33 +36,22 @@ volume = modal.Volume.from_name(
 )
 
 @app.function(
-    # cpu=2,
-    # memory=128,
-    gpu="t4",
     concurrency_limit=1,
     allow_concurrent_inputs=100,
     container_idle_timeout=1200,
-    timeout=3*60*60,  # 3 hours
-    # keep_warm=1,
+    timeout=3 * 60 * 60,  # 3 hours
     volumes={DIR: volume},
+    #cpu-2,
+    #memory=128,
+    #gpu="t4",
+    #keep_warm=1,
 )
 def run_invokeai():
     invokeai_port = 9090
     with modal.forward(invokeai_port) as tunnel:
 
-        # Check if directory exists, and create if not
-        if not os.path.exists(INVOKEAI_DIR):
-            mkdir_process = subprocess.Popen(
-                ["mkdir", "-p", INVOKEAI_DIR],
-                env=os.environ,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
-            mkdir_stdout, mkdir_stderr = mkdir_process.communicate()
-            if mkdir_process.returncode != 0:
-                print(f"Error creating directory: {mkdir_stderr}")
-                return
+        # Ensure the directory exists
+        os.makedirs(INVOKEAI_DIR, exist_ok=True)
 
         # Delete existing invokeai.yaml if it exists
         if os.path.exists(CONFIG_FILE):
@@ -72,27 +63,20 @@ def run_invokeai():
                 return
 
         # Download the latest configuration file
-        wget_process = subprocess.Popen(
-            [
-                "wget",
-                "https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/invokeai.yaml",
-                "-O",
-                CONFIG_FILE,
-            ],
-            env=os.environ,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
+        download_url = "https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/invokeai.yaml"
+        wget_process = subprocess.run(
+            ["wget", download_url, "-O", CONFIG_FILE],
+            capture_output=True,
+            text=True,
         )
-        wget_stdout, wget_stderr = wget_process.communicate()
+
         if wget_process.returncode != 0:
-            print(f"Error downloading configuration file: {wget_stderr}")
+            print(f"Error downloading configuration file: {wget_process.stderr}")
             return
 
-        # Use f-string for correct path substitution and directory
+        # Start InvokeAI server
         invokeai_process = subprocess.Popen(
             ["invokeai-web", "--root", INVOKEAI_DIR],
-            env=os.environ,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
