@@ -5,6 +5,7 @@ import modal
 DIR = "/root/invoke"
 INVOKEAI_DIR = f"{DIR}/invokeai"
 CONFIG_FILE = f"{INVOKEAI_DIR}/invokeai.yaml"
+REBUILD = False
 
 app = modal.App(
     "InvokeAI",
@@ -18,6 +19,7 @@ app = modal.App(
         "build-essential",
         "python3-opencv",
         "libopencv-dev",
+        force_build=REBUILD,
     )
     .pip_install(
         "pip",
@@ -27,13 +29,22 @@ app = modal.App(
         "torchaudio",
         "pypatchmatch",
         extra_index_url="https://pypi.org/simple",
-        #force_build=True,
+        force_build=REBUILD,
     )
 )
 
-volume = modal.Volume.from_name(
-    "Invoke", create_if_missing=True
-)
+volume = modal.Volume.from_name("Invoke", create_if_missing=True)
+
+def check_patchmatch_installation():
+    """Check if pypatchmatch and patch_match are correctly installed."""
+    try:
+        import patchmatch
+        from patchmatch import patch_match
+        print("pypatchmatch and patch_match are successfully imported.")
+        return True
+    except ImportError as e:
+        print(f"ImportError: {e}")
+        return False
 
 @app.function(
     concurrency_limit=1,
@@ -43,17 +54,16 @@ volume = modal.Volume.from_name(
     volumes={DIR: volume},
     #cpu-2,
     #memory=128,
-    #gpu="t4",
     #keep_warm=1,
+    gpu="t4",
 )
 def run_invokeai():
     invokeai_port = 9090
     with modal.forward(invokeai_port) as tunnel:
-
         # Ensure the directory exists
         os.makedirs(INVOKEAI_DIR, exist_ok=True)
 
-        # Delete existing invokeai.yaml if it exists
+        # Delete existing configuration file if it exists
         if os.path.exists(CONFIG_FILE):
             try:
                 os.remove(CONFIG_FILE)
@@ -72,6 +82,11 @@ def run_invokeai():
 
         if wget_process.returncode != 0:
             print(f"Error downloading configuration file: {wget_process.stderr}")
+            return
+
+        # Check if pypatchmatch is installed and functional
+        if not check_patchmatch_installation():
+            print("pypatchmatch is not installed or not functional. Exiting.")
             return
 
         # Start InvokeAI server
