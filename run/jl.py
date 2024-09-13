@@ -34,7 +34,6 @@ volume = modal.Volume.from_name("jupyterlab", create_if_missing=True)
     container_idle_timeout=1200,
     timeout=10800,  # 3 hours
     # keep_warm=1,
-    _allow_background_volume_commits=True,
 )
 def run_jupyterlab():
     jupyterlab_port = 8888
