@@ -6,6 +6,7 @@ DIR = "/root/invoke"
 INVOKEAI_DIR = f"{DIR}/invokeai"
 CONFIG_FILE = f"{INVOKEAI_DIR}/invokeai.yaml"
 REBUILD = False
+BETA = False
 
 app = modal.App(
     "InvokeAI",
@@ -22,14 +23,18 @@ app = modal.App(
         force_build=REBUILD,
     )
     .pip_install(
-        "pip",
-        "InvokeAI[xformers]",
         "torch",
         "torchvision",
         "torchaudio",
         "pypatchmatch",
         extra_index_url="https://pypi.org/simple",
         force_build=REBUILD,
+    )
+    .pip_install(
+        "InvokeAI[xformers]",
+        extra_index_url="https://pypi.org/simple",
+        force_build=REBUILD,
+        pre=BETA,
     )
 )
 
