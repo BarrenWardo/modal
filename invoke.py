@@ -5,11 +5,15 @@ import modal
 DIR = "/root/invoke"
 INVOKEAI_DIR = f"{DIR}/invokeai"
 CONFIG_FILE = f"{INVOKEAI_DIR}/invokeai.yaml"
-URL = "https://pypi.org/simple"
+EXTRA_INDEX_URL = "https://pypi.org/simple"
 REBUILD = False
 BETA = True
 HOURS = 12
 YAML = "https://gist.githubusercontent.com/BarrenWardo/128c628052d8bc4bea589645bdd4732a/raw/invokeai.yaml"
+GPU = "t4"
+IDLE = 1200
+CONCURRENT_INPUTS = 100
+CONCURRENCY_LIMIT = 1
 
 # Initialize the Modal app
 app = modal.App(
@@ -31,12 +35,12 @@ app = modal.App(
         "torchvision",
         "torchaudio",
         "pypatchmatch",
-        extra_index_url=URL,
+        extra_index_url=EXTRA_INDEX_URL,
         force_build=REBUILD,
     )
     .pip_install(
         "InvokeAI[xformers]",
-        extra_index_url=URL,
+        extra_index_url=EXTRA_INDEX_URL,
         force_build=REBUILD,
         pre=BETA,
     )
@@ -56,12 +60,15 @@ def check_patchmatch_installation():
         return False
 
 @app.function(
-    concurrency_limit=1,
-    allow_concurrent_inputs=100,
-    container_idle_timeout=1200,
+    concurrency_limit=CONCURRENCY_LIMIT,
+    allow_concurrent_inputs=CONCURRENT_INPUTS,
+    container_idle_timeout=IDLE,
     timeout=HOURS * 60 * 60,
     volumes={DIR: volume},
-    gpu="t4",
+    #cpu=2,
+    #memory=128,
+    #keep_warm=1,
+    gpu=GPU,
 )
 def run_invokeai():
     invokeai_port = 9090
