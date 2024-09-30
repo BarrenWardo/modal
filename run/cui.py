@@ -1,8 +1,20 @@
 import os
 import subprocess
+import threading
+import time
 import modal
 
 DIR = "/root/comfy"
+EXTRA_INDEX_URL = "https://pypi.org/simple"
+REBUILD = False
+HOURS = 12
+GPU = "t4"
+IDLE = 1200
+CONCURRENT_INPUTS = 100
+CONCURRENCY_LIMIT = 1
+PORT = 8188
+CUSTOM_CMD = ""
+ARGS = "--listen 0.0.0.0"
 
 app = modal.App(
     "ComfyUI",
@@ -13,6 +25,7 @@ app = modal.App(
         "libgl1",
         "libglib2.0-0",
         "aria2",
+        force_build=REBUILD,
     )
     .pip_install(
         "accelerate",
@@ -127,6 +140,8 @@ app = modal.App(
         "yacs",
         "yapf",
         "yoloworld",
+        extra_index_url=EXTRA_INDEX_URL,
+        force_build=REBUILD
     )
 )
 
@@ -135,29 +150,37 @@ volume = modal.Volume.from_name(
 )
 
 @app.function(
-    # cpu=2,
-    # memory=128,
-    gpu="t4",
-    concurrency_limit=1,
-    allow_concurrent_inputs=100,
-    container_idle_timeout=1200,
-    timeout=3*60*60,  # 3 hours
-    # keep_warm=1,
+    concurrency_limit=CONCURRENCY_LIMIT,
+    allow_concurrent_inputs=CONCURRENT_INPUTS,
+    container_idle_timeout=IDLE,
+    timeout=HOURS * 60 * 60,
     volumes={DIR: volume},
+    #cpu=2,
+    #memory=128,
+    #keep_warm=1,
+    gpu=GPU,
 )
-
 def run_comfy():
-    comfy_port = 8188
-    with modal.forward(comfy_port) as tunnel:
+    with modal.forward(PORT) as tunnel:
         cui_folder = os.path.join(DIR, "CUI")
         if os.path.exists(cui_folder):
-            comfy_process_cmd = f"cd {cui_folder} && git pull && python main.py --listen 0.0.0.0"
+            cmd = f"cd {cui_folder} && git pull && python main.py {ARGS}"
         else:
-            comfy_process_cmd = f"cd {DIR} && git clone https://github.com/comfyanonymous/ComfyUI.git CUI && cd CUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Manager.git && cd ../.. && python main.py"
-        quickfix = f"cd {cui_folder}/models/unet && wget https://huggingface.co/BarrenWardo/SD-Models/resolve/main/flux1-dev.sft"
-        comfy_process = subprocess.Popen(comfy_process_cmd, shell=True)
-        print(f"ComfyUI available at => {tunnel.url}")
-        comfy_process.wait()
+            cmd = f"""
+            cd {DIR} &&
+            git clone https://github.com/comfyanonymous/ComfyUI.git CUI &&
+            cd CUI/custom_nodes &&
+            git clone https://github.com/ltdrdata/ComfyUI-Manager.git &&
+            cd ../.. &&
+            python main.py {ARGS}
+            """
+        
+        def delayed_print():
+            time.sleep(10)
+            print(f"ComfyUI available at => {tunnel.url}")
+
+        threading.Thread(target=delayed_print, daemon=True).start()
+        subprocess.run(cmd, shell=True, check=True)
 
 @app.local_entrypoint()
 def main():
