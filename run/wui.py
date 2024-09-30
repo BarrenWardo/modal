@@ -32,6 +32,7 @@ app = modal.App(
         "addict",
         "albumentations",
         "av",
+        "basicsr",
         "beautifulsoup4",
         "blendmodes",
         "clean-fid",
