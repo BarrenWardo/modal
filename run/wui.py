@@ -1,8 +1,20 @@
 import os
 import subprocess
+import threading
+import time
 import modal
 
 DIR = "/root/WUI"
+EXTRA_INDEX_URL = "https://pypi.org/simple"
+REBUILD = False
+HOURS = 12
+GPU = "t4"
+IDLE = 1200
+CONCURRENT_INPUTS = 100
+CONCURRENCY_LIMIT = 1
+PORT = 8188
+CUSTOM_CMD = ""
+ARGS = "--allow-code --enable-insecure-extension-access --administrator --log-startup --xformers --update-check --listen --port 7860"
 
 app = modal.App(
     "A1111",
@@ -12,6 +24,8 @@ app = modal.App(
         "git",
         "libgl1",
         "libglib2.0-0",
+        "aria2",
+        force_build=REBUILD,
     )
     .pip_install(
         "accelerate",
@@ -82,34 +96,35 @@ app = modal.App(
         "xformers",
         "yapf",
         "ZipUnicode",
+        extra_index_url=EXTRA_INDEX_URL,
+        force_build=REBUILD
     )
 )
 
-volume = modal.Volume.from_name(
-    "WUI", create_if_missing=True
-)
+volume = modal.Volume.from_name("WUI", create_if_missing=True)
 
 @app.function(
-    # cpu=2,
-    # memory=128,
-    gpu="t4",
-    concurrency_limit=1,
-    allow_concurrent_inputs=100,
-    container_idle_timeout=1200,
-    timeout=12*60*60,  # 3 hours
-    # keep_warm=1,
+    concurrency_limit=CONCURRENCY_LIMIT,
+    allow_concurrent_inputs=CONCURRENT_INPUTS,
+    container_idle_timeout=IDLE,
+    timeout=HOURS * 60 * 60,
     volumes={DIR: volume},
-    _allow_background_volume_commits=True,
+    #cpu=2,
+    #memory=128,
+    #keep_warm=1,
+    gpu=GPU,
 )
 
 def run_wui():
-    wui_port = 7860
-    with modal.forward(wui_port) as tunnel:
-        wui_process_cmd = f"cd {DIR} && git pull && python launch.py --allow-code --enable-insecure-extension-access --administrator --log-startup --xformers --update-check --listen --port 7860"
-        quickfix = f"git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git WUI"
-        wui_process = subprocess.Popen(wui_process_cmd, shell=True)
-        print(f"A1111 available at => {tunnel.url}")
-        wui_process.wait()
+    with modal.forward(PORT) as tunnel:
+        cmd = f"cd {DIR} && git pull && python launch.py {ARGS}"
+        
+        def delayed_print():
+            time.sleep(10)
+            print(f"A1111 available at => {tunnel.url}")
+
+        threading.Thread(target=delayed_print, daemon=True).start()
+        subprocess.run(cmd, shell=True, check=True)
 
 @app.local_entrypoint()
 def main():
