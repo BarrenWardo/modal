@@ -12,9 +12,9 @@ GPU = "t4"
 IDLE = 1200
 CONCURRENT_INPUTS = 100
 CONCURRENCY_LIMIT = 1
-PORT = 8188
+PORT = 7860
 CUSTOM_CMD = ""
-ARGS = "--allow-code --enable-insecure-extension-access --administrator --log-startup --xformers --update-check --listen --port 7860"
+ARGS = f"--allow-code --enable-insecure-extension-access --administrator --log-startup --xformers --update-check --listen --api --port {PORT}"
 
 app = modal.App(
     "A1111",
@@ -117,7 +117,15 @@ volume = modal.Volume.from_name("WUI", create_if_missing=True)
 
 def run_wui():
     with modal.forward(PORT) as tunnel:
-        cmd = f"cd {DIR} && git pull && python launch.py {ARGS}"
+        wui_folder = os.path.join(DIR, "WUI")
+        if os.path.exists(wui_folder):
+            cmd = f"cd {wui_folder} && git pull && python launch.py {ARGS}"
+        else:
+            cmd = f"""
+            cd {DIR} &&
+            git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git WUI &&
+            python launch.py {ARGS}
+            """
         
         def delayed_print():
             time.sleep(10)
